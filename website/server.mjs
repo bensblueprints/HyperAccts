@@ -31,6 +31,10 @@ const types = {
   '.exe': 'application/octet-stream',
 };
 
+// Privacy-respecting analytics: only these high-level event names are accepted.
+// Request headers, cookies, and IP addresses are never read or recorded.
+const ALLOWED_EVENTS = new Set(['page_view', 'checkout_start', 'purchase_complete']);
+
 let stripeClient = null;
 let stripeMissing = false;
 
@@ -81,6 +85,40 @@ async function recordEvent(file, event) {
   }
 }
 
+// Append a sanitized analytics event. Only whitelisted event names and an optional
+// safe label survive; no client identifiers, headers, cookies, or IPs are stored.
+async function recordAnalytics(eventName, label) {
+  try {
+    const dir = path.join(root, 'data');
+    await mkdir(dir, {recursive: true});
+    const entry = {
+      event: eventName,
+      received_at: new Date().toISOString(),
+    };
+    if (label && typeof label === 'string' && label.length <= 200) {
+      entry.label = label;
+    }
+    await appendFile(path.join(dir, 'events.jsonl'), JSON.stringify(entry) + '\n');
+  } catch {
+    // Analytics recording must never affect the request path.
+  }
+}
+
+async function handleAnalyticsEvent(req, res) {
+  let payload;
+  try {
+    payload = JSON.parse((await readBody(req)).toString('utf-8') || '{}');
+  } catch {
+    return json(res, 400, {error: 'Invalid JSON.'});
+  }
+  const event = payload && payload.event;
+  if (!event || !ALLOWED_EVENTS.has(event)) {
+    return json(res, 400, {error: 'Unsupported event.'});
+  }
+  await recordAnalytics(event, payload.label);
+  return json(res, 200, {received: true});
+}
+
 async function createCheckoutSession(req, res) {
   const stripe = await loadStripe();
   if (!stripe) {
@@ -121,7 +159,9 @@ async function handleWebhook(req, res) {
     case 'checkout.session.completed': {
       const session = event.data.object;
       await recordEvent('checkout-sessions.jsonl', event);
-      // Delivery gating (installer + license key) is deferred to task 491.
+      // Delivery gating (installer + license key) is deferred to task 491;
+      // the server-side completion (source of truth) also records a purchase event.
+      await recordAnalytics('purchase_complete', session.id);
       return json(res, 200, {received: true, session_id: session.id});
     }
     default:
@@ -156,6 +196,9 @@ const server = http.createServer(async (req, res) => {
   }
   if (req.method === 'POST' && pathname === '/api/webhook') {
     return handleWebhook(req, res);
+  }
+  if (req.method === 'POST' && pathname === '/api/event') {
+    return handleAnalyticsEvent(req, res);
   }
   return serveFile(req, res);
 });
