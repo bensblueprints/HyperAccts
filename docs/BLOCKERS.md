@@ -2,6 +2,15 @@
 
 Updated September 30, 2026. This is a handoff of the actual implementation, not a claim of production readiness.
 
+## Source fixes — October 1, 2026
+
+- Added an Ollama-backed AI assistant, defaulting to Qwen3 Coder Next Abliterated. It supports chat and natural-language workflow drafts that users inspect in the existing creator editor. Generated content is validated and cannot execute actions. DeepSeek and public catalog search remain unimplemented.
+- Verified a real Coder response through the local HTTP API and the UI: a three-step YouTube checklist opened in Creator studio and saved as a draft.
+- Connector writes fetch a fresh session token on every request, fixing stale tokens after a service restart without automatically retrying writes. Changing a credential creates a new reference so cancelling an edit does not replace the saved profile's key. Failed checks and mode changes clear stale check indicators; edits/saves cannot race an active check.
+- Added six regression checks, bringing the local suite to 11 passing tests.
+- Added `.github/workflows/check.yml` for Windows tests and installer builds. GitHub SSH authentication is available, avoiding the HTTPS OAuth token's missing workflow scope. Check the branch's Actions result before merging.
+- These changes are in source; the public 0.1.0 download remains the original preview until a new release is published.
+
 ## Published and verified
 
 - Private repository: https://github.com/bensblueprints/HyperAccts
@@ -18,8 +27,8 @@ Updated September 30, 2026. This is a handoff of the actual implementation, not 
 |---|---|
 | Take the app out of simulation mode | There is no live campaign execution engine to enable. The runner generates configured mock outcomes. Removing the label would not create live behavior. |
 | Playwright / browser-use execution | Neither runtime is integrated into the shipped application. Browser control used during development is not an application feature. Browser sessions, step execution and recovery are missing. |
-| Talk to the app through DeepSeek | No chat UI, DeepSeek adapter, model configuration, conversation history or controlled action interface exists. No DeepSeek API key was supplied or configured. A key alone would not supply the missing integration. |
-| Find or create solutions from natural language | The catalog consists of local demo listings. There is no solution search backend or AI solution generator. |
+| Talk to the app through DeepSeek | Ollama chat, model configuration, window-local conversation history, and reviewed workflow drafts now exist. A DeepSeek adapter and API key are still absent. |
+| Find or create solutions from natural language | Natural-language draft generation now works through Ollama. The catalog still consists of local listings; no shared solution search backend exists. |
 | Import and bind proxies | No proxy importer, proxy credential storage, validation, browser-profile assignment or campaign binding is implemented. SMS/CAPTCHA connector bindings are separate and do not bind proxies. |
 | Created-account inventory | No real account creation occurs. The results table contains mock campaign records, not a secure account inventory. Durable storage, credential handling and an inventory interface are missing. |
 | List an account for sale with a price | Not implemented. The existing price field belongs to a reusable workflow solution. There is no account listing, account transfer, checkout or sales backend. |
@@ -40,7 +49,7 @@ Permissible alternatives offered were official-API integrations, workflows for a
 - Workflow steps are declarative metadata. The simulator does not execute their definitions, branching or creator code.
 - The preview binaries are unsigned. Automatic updates, release signing and a supported Windows version policy remain outstanding. Executable resource editing is currently disabled in the packaging configuration.
 - The installer is the 0.1.0 preview, not a build of later documentation or website-hosting changes. The repository's main branch is the current source of truth.
-- GitHub rejected the initial push containing an Actions workflow because the current OAuth authentication lacks the `workflow` scope. The workflow was retained as `docs/check-workflow.yml`; it is not active CI. Local checks and packaging succeeded. Enabling CI requires authorized workflow access and placing the file under `.github/workflows/`.
+- The initial HTTPS push could not publish Actions because its OAuth token lacked `workflow` scope. A workflow now lives under `.github/workflows/check.yml`; use the existing GitHub SSH identity to push it. `docs/check-workflow.yml` records the original handoff template.
 - No end-to-end live platform account creation, live payment, provider-spending or account-transfer testing has been performed.
 
 ## Handoff references
