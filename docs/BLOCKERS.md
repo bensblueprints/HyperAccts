@@ -1,6 +1,16 @@
 # Implementation status and blockers
 
-Updated September 30, 2026. This is a handoff of the actual implementation, not a claim of production readiness.
+Updated October 1, 2026. This is a handoff of the actual implementation, not a claim of production readiness.
+
+## Desktop reliability update (0.1.1, work branch)
+
+- Fixed the incomplete npm lockfile that prevented clean installs.
+- Added validated, versioned workspace files in the desktop user-data directory, ordered atomic writes, previous-save recovery, and preservation of corrupt files. Newer schema versions are not silently rolled back.
+- Existing version 1 browser workspaces migrate on startup. Pending browser changes are recovered after an interrupted save; failed migrations retain the original copy.
+- Workspace settings shows save status and provides backup export, validated import with a review step, and a storage retry action. Connection-test credentials and provider keys are excluded from persistent snapshots.
+- Added 17 automated checks for migration, failed writes, backup validation, recovery, API protections and restart persistence; all 22 checks pass on the Dell. Browser testing verified migration of a separately created old-format draft.
+- Qwen supplied initial storage and test drafts through Boardly/Justin's SSH checkout. They required supervisor corrections before tests passed. The Qwen Work run later returned “no usable answer”; this is not evidence that the desktop implementation failed or that the draft was ready without review.
+- This branch is an unsigned local preview. It has not replaced the public download or been deployed to production. Live account automation and the features listed below remain unimplemented.
 
 ## Published and verified
 
@@ -35,11 +45,11 @@ Permissible alternatives offered were official-API integrations, workflows for a
 
 ## Engineering and release limitations
 
-- Workspace state is localStorage, not an encrypted multiuser database. No production migration, backup or account-vault mechanism exists.
+- Desktop workspace state now uses validated local JSON files with a last-good recovery copy and backup import/export. Browser-only previews retain a localStorage fallback. Files and exports are unencrypted; an encrypted multiuser database and account vault remain unimplemented.
 - Provider keys are held in local service memory and must be entered again after restart. Budget and timeout preferences do not enforce live campaign spending or runtime limits.
 - Workflow steps are declarative metadata. The simulator does not execute their definitions, branching or creator code.
 - The preview binaries are unsigned. Automatic updates, release signing and a supported Windows version policy remain outstanding. Executable resource editing is currently disabled in the packaging configuration.
-- The installer is the 0.1.0 preview, not a build of later documentation or website-hosting changes. The repository's main branch is the current source of truth.
+- The published installer is still the 0.1.0 preview. The 0.1.1 reliability build is isolated on qwen/desktop-reliability-20261001 until reviewed and released.
 - GitHub rejected the initial push containing an Actions workflow because the current OAuth authentication lacks the `workflow` scope. The workflow was retained as `docs/check-workflow.yml`; it is not active CI. Local checks and packaging succeeded. Enabling CI requires authorized workflow access and placing the file under `.github/workflows/`.
 - No end-to-end live platform account creation, live payment, provider-spending or account-transfer testing has been performed.
 

@@ -1,10 +1,17 @@
 import {platforms,sampleRecords,parseCSV,validateCampaign,summary,transition,recoverCampaigns,makeCampaign} from './domain.mjs';
 import {initialSolutions,initialLicenses,stepKinds,validateSolution,unlockSolution,snapshotSolution} from './market.mjs';
 import {providers,initialConnections,validateConnection,mockConnectionCheck,checkRequirements} from './connectors.mjs';
+import {createWorkspaceClient} from './workspace-client.mjs';
+import {validateWorkspace,MAX_WORKSPACE_BYTES} from './workspace-schema.mjs';
 
 const $=s=>document.querySelector(s),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const STORE='hyperaccts-v1';
-let state,storageIssue='';
+let state,storageIssue='',workspaceBusy=false,pendingImport=null;
+const workspace=createWorkspaceClient({storage:{getItem:key=>localStorage.getItem(key),setItem:(key,value)=>localStorage.setItem(key,value),removeItem:key=>localStorage.removeItem(key)},onStatus:({kind,message})=>{
+  storageIssue=['warning','error'].includes(kind)?message:'';
+  const summary=$('#storage-summary');if(summary)summary.textContent=message;
+  const status=$('#storage-status');if(status){status.textContent=message;status.dataset.status=kind;}
+  const notice=$('#storage-notice');if(notice){notice.textContent=storageIssue;notice.hidden=!storageIssue;}
+}});
 function seed(){
   const solutions=initialSolutions(),licenses=initialLicenses();
   const a=makeCampaign('youtube','YouTube · channel onboarding');
@@ -15,14 +22,13 @@ function seed(){
   c.records=[{...sampleRecords()[0],id:'amazon-demo'}];
   return {version:1,campaigns:[a,done,c],solutions,licenses,creatorName:'My studio',connections:initialConnections()};
 }
-try{const saved=JSON.parse(localStorage.getItem(STORE)||'null');state=saved?.version===1&&Array.isArray(saved.campaigns)&&Array.isArray(saved.solutions)&&Array.isArray(saved.licenses)?saved:seed();state.campaigns=recoverCampaigns(state.campaigns);}catch{state=seed();storageIssue='Saved workspace could not be read. A fresh demo was loaded.';}
+state=await workspace.load(seed);const recoveredRunning=state.campaigns.some(c=>c.status==='running');state.campaigns=recoverCampaigns(state.campaigns);
 state.connections=state.connections||initialConnections();
-function persist(){try{localStorage.setItem(STORE,JSON.stringify(state));return true;}catch{storageIssue='Browser storage is unavailable or full. Changes currently last only until this page closes.';toast(storageIssue);return false;}}
-persist();
+function persist(){return workspace.persist(state);}
 let page='campaigns',query='',filter='all',marketQuery='',marketGroup='all',wizardStep=0,draft=null,editingId=null,wizardErrors=[],detailId=null,creatorDraft=null,creatorErrors=[];
 let connection=null,checking=false;
 let connectorDraft=null,connectorErrors=[],connectorResult=null,connectorTesting=false,csrf=null;
-const labels={campaigns:'Campaigns',platforms:'Platforms',marketplace:'Marketplace',creators:'Creator studio',activity:'Activity',connectors:'Connectors',connections:'System status'};
+const labels={campaigns:'Campaigns',platforms:'Platforms',marketplace:'Marketplace',creators:'Creator studio',activity:'Activity',connectors:'Connectors',connections:'System status',workspace:'Workspace settings'};
 function campaignIssues(c){return [...validateCampaign(c),...checkRequirements({requirements:c.requirements},state.connections,c.bindings||{}).map(message=>({field:'connectors',message}))];}
 function getP(id){return platforms.find(p=>p.id===id)||platforms[0];}
 function mark(p,large=false){return `<span class="platform-mark ${large?'large':''}" style="--platform-color:${p.color}">${esc(p.mark)}</span>`;}
@@ -38,8 +44,16 @@ function render(){
   document.querySelectorAll('[data-nav]').forEach(b=>b.classList.toggle('active',b.dataset.nav===page));
   $('#breadcrumb').innerHTML=`Workspace <span>/</span> ${labels[page]}`;
   $('#nav-count').textContent=state.campaigns.length;
-  const views={campaigns:campaignsView,platforms:platformsView,marketplace:marketplaceView,creators:creatorsView,activity:activityView,connectors:connectorsView,connections:connectionsView};
-  $('#app').innerHTML=(storageIssue?`<div class="notice warn">${esc(storageIssue)}</div>`:'')+views[page]()+`<div class="footer-note">Prototype workspace · Simulated execution and purchases · No real accounts are created</div>`;
+  const views={campaigns:campaignsView,platforms:platformsView,marketplace:marketplaceView,creators:creatorsView,activity:activityView,connectors:connectorsView,connections:connectionsView,workspace:workspaceView};
+  $('#app').innerHTML=`<div id="storage-notice" class="notice warn" role="status" ${storageIssue?'':'hidden'}>${esc(storageIssue)}</div>`+views[page]()+`<div class="footer-note">Prototype workspace · Simulated execution and purchases · No real accounts are created</div>`;
+}
+function workspaceView(){return heading('Your workspace, kept safe.','Save your work on this computer and keep a portable backup.')+`<div class="connection-grid"><section class="panel connection-card"><h2>Storage and recovery</h2><p id="storage-status" role="status" data-status="${workspace.status.kind}">${esc(workspace.status.message)}</p><dl><div class="definition"><dt>Campaigns</dt><dd>${state.campaigns.length}</dd></div><div class="definition"><dt>Workflow solutions</dt><dd>${state.solutions.length}</dd></div><div class="definition"><dt>Connection profiles</dt><dd>${state.connections.length}</dd></div><div class="definition"><dt>Workspace format</dt><dd>Version 1</dd></div></dl><button data-action="storage-retry" ${workspaceBusy?'disabled':''}>Retry storage connection</button><p>Desktop saves keep a previous good copy for recovery. If a save is interrupted, the app checks for pending browser changes at startup.</p></section><section class="panel connection-card"><h2>Backup and restore</h2><p>Back up campaigns, workflow definitions, demo unlocks and connection preferences.</p><div class="backup-actions"><button class="primary" data-action="workspace-export">Export workspace backup</button><button data-action="workspace-import" ${workspaceBusy?'disabled':''}>Import backup</button></div><input id="workspace-backup-file" type="file" accept=".json,application/json" hidden><p>Backup files are unencrypted. Provider keys and connection-test credentials are excluded. Keep backups somewhere private.</p><div class="notice">Restoring replaces this workspace after you review the backup. The previous saved workspace remains in the local recovery file.</div></section></div>`;}
+function reviewBackup(input){
+  if(!input||typeof input!=='object')throw new Error('Choose a valid HyperAccts JSON backup.');
+  if(input.format!==undefined&&(input.format!=='hyperaccts-workspace'||input.backupVersion!==1))throw new Error('Unsupported backup format. Choose a HyperAccts version 1 backup.');
+  pendingImport=validateWorkspace(input.format?input.state:input);
+  $('#backup-review').innerHTML=`<div class="modal-head"><h2 id="backup-title">Restore this workspace?</h2><button data-action="backup-cancel" aria-label="Cancel restore">×</button></div><div class="modal-body"><p>This backup contains <b>${pendingImport.campaigns.length} campaigns</b>, <b>${pendingImport.solutions.length} solutions</b> and <b>${pendingImport.connections.length} connection profiles</b>.</p><p>It will replace the current workspace. Running simulations will be paused. Export the current workspace first if you want a separate copy.</p><p id="backup-error" class="notice warn" role="alert" hidden></p></div><div class="modal-footer"><button data-action="workspace-export">Export current workspace</button><div class="right"><button data-action="backup-cancel">Cancel</button><button class="primary" data-action="backup-confirm">Restore backup</button></div></div>`;
+  $('#backup-review').showModal();
 }
 function campaignsView(){
   const running=state.campaigns.filter(c=>c.status==='running').length;
@@ -133,6 +147,21 @@ document.addEventListener('click',async e=>{
   const a=b.dataset.action,id=b.dataset.id;
   if(['start','pause','resume','stop','retry'].includes(a)){doTransition(id,a);return;}
   switch(a){
+    case'workspace-export':try{download('HyperAccts-workspace-'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify({format:'hyperaccts-workspace',backupVersion:1,createdAt:new Date().toISOString(),state:validateWorkspace(state)}));}catch(error){toast(error.message);}break;
+    case'workspace-import':$('#workspace-backup-file').click();break;
+    case'backup-cancel':if(!workspaceBusy){pendingImport=null;$('#backup-review').close();}break;
+    case'backup-confirm':{
+      if(workspaceBusy||!pendingImport)break;
+      workspaceBusy=true;b.disabled=true;
+      try{const restored=structuredClone(pendingImport);restored.campaigns=recoverCampaigns(restored.campaigns);state=await workspace.restore(restored);pendingImport=null;$('#backup-review').close();nav('workspace');toast('Backup restored.');}
+      catch(error){const el=$('#backup-error');el.hidden=false;el.textContent=error.message;}
+      finally{workspaceBusy=false;b.disabled=false;render();}break;
+    }
+    case'storage-retry':{
+      if(workspaceBusy)break;workspaceBusy=true;b.disabled=true;
+      try{state=await workspace.load(()=>state);state.campaigns=recoverCampaigns(state.campaigns);}
+      finally{workspaceBusy=false;render();}break;
+    }
     case'connector-new':openConnector();break;
     case'connector-provider':openConnector(null,id);break;
     case'connector-edit':openConnector(id);break;
@@ -189,10 +218,14 @@ document.addEventListener('change',async e=>{
   if(t.id==='campaign-filter'){filter=t.value;$('#campaign-table').innerHTML=campaignTable();}
   if(t.id==='market-group'){marketGroup=t.value;$('#solution-grid').innerHTML=marketCards();}
   if(t.id==='csv-file'&&t.files[0]){try{if(t.files[0].size>1024*1024)throw new Error('Choose a CSV smaller than 1 MB.');draft.records=parseCSV(await t.files[0].text());wizardErrors=[];}catch(error){wizardErrors=[error.message];}renderWizard();}
+  if(t.id==='workspace-backup-file'&&t.files[0]){try{if(t.files[0].size>MAX_WORKSPACE_BYTES+1024)throw new Error('Choose a backup smaller than 4 MiB.');reviewBackup(JSON.parse(await t.files[0].text()));}catch(error){toast(error instanceof SyntaxError?'The selected file is not valid JSON. Your workspace has not changed.':error.message);}finally{t.value='';}}
 });
 window.addEventListener('hashchange',()=>{const p=location.hash.slice(1);if(labels[p]&&p!==page){page=p;render();}});
 setInterval(()=>{
+  if(workspaceBusy)return;
   let changed=false;state.campaigns=state.campaigns.map(c=>{if(c.status!=='running')return c;changed=true;return transition(c,'tick');});
   if(changed){persist();if(page==='campaigns'&&!$('#wizard').open)render();if(page==='activity')render();if($('#details').open)renderDetails();}
 },1400);
 page=labels[location.hash.slice(1)]?location.hash.slice(1):'campaigns';render();
+if(recoveredRunning)persist();
+window.addEventListener('beforeunload',event=>{if(workspace.pending){event.preventDefault();event.returnValue='';}});
