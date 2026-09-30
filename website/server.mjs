@@ -1,6 +1,5 @@
 import http from 'node:http';
-import {readFile} from 'node:fs/promises';
-import {appendFile, mkdir} from 'node:fs/promises';
+import {readFile, appendFile, mkdir} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
 import path from 'node:path';
 
@@ -32,26 +31,25 @@ const types = {
   '.exe': 'application/octet-stream',
 };
 
-// Stripe is loaded lazily so the local preview can still run without a key installed.
-let stripe = null;
-function getStripe() {
-  if (!process.env.STRIPE_SECRET_KEY) {
+let stripeClient = null;
+let stripeMissing = false;
+
+// Lazy-load Stripe only when both required secrets are present. The local preview
+// (no keys set) still serves static pages and returns 503 for checkout endpoints.
+async function loadStripe() {
+  if (stripeClient) return stripeClient;
+  if (stripeMissing) return null;
+  if (!process.env.STRIPE_SECRET_KEY) return null;
+  let Stripe;
+  try {
+    ({default: Stripe} = await import('stripe'));
+  } catch {
+    stripeMissing = true;
     return null;
   }
-  if (!stripe) {
-    const {default: Stripe} = requireStripe();
-    stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-  }
-  return stripe;
+  stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY);
+  return stripeClient;
 }
-
-function requireStripe() {
-  // ESM-friendly dynamic import of the stripe package.
-  return undefined; // replaced below by lazy ESM import
-}
-
-// ESM import of Stripe works at top-level too; we guard construction by key presence.
-const stripeLib = null;
 
 function json(res, status, obj) {
   const body = JSON.stringify(obj);
@@ -68,17 +66,24 @@ async function readBody(req) {
   return Buffer.concat(chunks);
 }
 
-// Idempotent event recorder: writes one JSON line per Stripe event id, skipping dupes.
-async function recordEvent(file, eventId, event) {
-  const dir = path.join(root, 'data');
-  await mkdir(dir, {recursive: true});
-  const target = path.join(dir, file);
-  await appendFile(target, JSON.stringify({id: eventId, type: event.type, at: new Date().toISOString()}) + '\n');
+// Idempotent event store: one JSON line per Stripe event id, so retries do not duplicate.
+async function recordEvent(file, event) {
+  try {
+    const dir = path.join(root, 'data');
+    await mkdir(dir, {recursive: true});
+    await appendFile(path.join(dir, file), JSON.stringify({
+      id: event.id,
+      type: event.type,
+      received_at: new Date().toISOString(),
+    }) + '\n');
+  } catch {
+    // Recording must not crash the webhook response path.
+  }
 }
 
 async function createCheckoutSession(req, res) {
-  const client = (await loadStripe())?.client;
-  if (!client) {
+  const stripe = await loadStripe();
+  if (!stripe) {
     return json(res, 503, {error: 'Payment processing is not configured.'});
   }
   const priceId = process.env.STRIPE_PRICE_ID;
@@ -86,7 +91,7 @@ async function createCheckoutSession(req, res) {
     return json(res, 503, {error: 'No Stripe price configured.'});
   }
   const baseUrl = process.env.BASE_URL || 'http://127.0.0.1:4180';
-  const session = await client.checkout.sessions.create({
+  const session = await stripe.checkout.sessions.create({
     mode: 'payment',
     line_items: [{price: priceId, quantity: 1}],
     success_url: `${baseUrl}/purchase/success?session_id={CHECKOUT_SESSION_ID}`,
@@ -98,40 +103,30 @@ async function createCheckoutSession(req, res) {
 }
 
 async function handleWebhook(req, res) {
-  const client = (await loadStripe())?.client;
-  if (!client) return json(res, 503, {error: 'Webhook not configured.'});
+  const stripe = await loadStripe();
+  if (!stripe) return json(res, 503, {error: 'Webhook not configured.'});
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
   const signature = req.headers['stripe-signature'];
   const raw = await readBody(req);
+  if (!secret || !signature) {
+    return json(res, 400, {error: 'Missing webhook signature.'});
+  }
   let event;
   try {
-    event = client.webhooks.constructEvent(raw, signature, secret);
+    event = stripe.webhooks.constructEvent(raw, signature, secret);
   } catch (err) {
     return json(res, 400, {error: `Webhook signature verification failed: ${err.message}`});
   }
-  // Idempotent handling: record completed checkout events exactly once.
   switch (event.type) {
     case 'checkout.session.completed': {
       const session = event.data.object;
-      await recordEvent('checkout-sessions.jsonl', event.id, {
-        type: event.type,
-        session_id: session.id,
-        customer: session.customer,
-        amount_total: session.amount_total,
-        currency: session.currency,
-      });
-      return json(res, 200, {received: true});
+      await recordEvent('checkout-sessions.jsonl', event);
+      // Delivery gating (installer + license key) is deferred to task 491.
+      return json(res, 200, {received: true, session_id: session.id});
     }
     default:
       return json(res, 200, {received: true});
   }
-}
-
-async function loadStripe() {
-  if (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET) return null;
-  const {default: Stripe} = await import('stripe').catch(() => ({}));
-  if (!Stripe) return null;
-  return {client: new Stripe(process.env.STRIPE_SECRET_KEY)};
 }
 
 async function serveFile(req, res) {
