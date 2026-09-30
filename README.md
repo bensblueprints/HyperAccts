@@ -6,6 +6,8 @@ A Windows desktop workspace for campaign workflows, reusable solutions, and a cr
 
 Version 0.1.0 is an interactive product prototype, not a complete replacement execution engine. Campaign runs, solution purchases, and creator publishing are local simulations. No real accounts are created. There is no public marketplace backend or payment processing yet.
 
+See [current blockers and implementation handoff](docs/BLOCKERS.md) for the requested live-mode, DeepSeek, proxy-import, account-inventory and sales features, the assistance scope boundary, and release/CI limitations.
+
 Included: campaign creation and editing, strict mock CSV import, simulation controls, per-record results, failed-record retry, export, local persistence, demo solution unlocks, version snapshots, creator step editor, connector requirements, SMSPVA / DaisySMS / 2Captcha profiles and balance-check adapters, and a public product website.
 
 Planned platform coverage: Gmail, YouTube, Outlook, Facebook, Reddit, Instagram, Amazon, Apple accounts and Apple Developer enrollment, Google accounts and Google Play Console enrollment. Actual inspected legacy coverage varies; see [audit](docs/AUDIT.md).
