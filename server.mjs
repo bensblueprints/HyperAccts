@@ -3,16 +3,17 @@ import {readFile} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
 import path from 'node:path';
 import {randomBytes,randomUUID,timingSafeEqual} from 'node:crypto';
+import {createAssistant,validateMessages} from './ai.mjs';
 
 const root=path.dirname(fileURLToPath(import.meta.url));
-export function createAppServer({port=4173,fetchProvider=fetch}={}){
+export function createAppServer({port=4173,fetchProvider=fetch,assistant=createAssistant()}={}){
 const token=randomBytes(32).toString('hex');
 const secrets=new Map();
-const allowedFiles=new Set(['index.html','styles.css','app.mjs','domain.mjs','market.mjs','connectors.mjs','README.md','docs/PRODUCT.md','docs/AUDIT.md','docs/ARCHITECTURE.md','audit-evidence.json']);
+const allowedFiles=new Set(['index.html','styles.css','app.mjs','api-client.mjs','domain.mjs','market.mjs','connectors.mjs','README.md','docs/PRODUCT.md','docs/AUDIT.md','docs/ARCHITECTURE.md','audit-evidence.json']);
 const mime={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.json':'application/json; charset=utf-8','.md':'text/plain; charset=utf-8'};
 function send(res,status,data){res.writeHead(status,{'content-type':'application/json; charset=utf-8','cache-control':'no-store','x-content-type-options':'nosniff'});res.end(JSON.stringify(data));}
-async function body(req){let chunks=[],length=0;for await(const chunk of req){length+=chunk.length;if(length>16384)throw new Error('Request too large');chunks.push(chunk);}return JSON.parse(Buffer.concat(chunks).toString()||'{}');}
-function validToken(value){if(typeof value!=='string'||value.length!==token.length)return false;return timingSafeEqual(Buffer.from(value),Buffer.from(token));}
+async function body(req,limit=16384){let chunks=[],length=0;for await(const chunk of req){length+=chunk.length;if(length>limit)throw new Error('Request too large');chunks.push(chunk);}return JSON.parse(Buffer.concat(chunks).toString()||'{}');}
+function validToken(value){if(typeof value!=='string'||!/^[a-f0-9]{64}$/.test(value))return false;return timingSafeEqual(Buffer.from(value),Buffer.from(token));}
 const server=http.createServer(async(req,res)=>{
   const hosts=[`127.0.0.1:${port}`,`localhost:${port}`];
   if(!hosts.includes(req.headers.host))return send(res,403,{ok:false,message:'Invalid local host.'});
@@ -20,6 +21,15 @@ const server=http.createServer(async(req,res)=>{
   const url=new URL(req.url,`http://127.0.0.1:${port}`);
   try{
     if(req.method==='GET'&&url.pathname==='/api/session')return send(res,200,{csrf:token});
+    if(req.method==='GET'&&url.pathname==='/api/ai/status')return send(res,200,await assistant.status());
+    if(req.method==='POST'&&url.pathname==='/api/ai/chat'){
+      if(!validToken(req.headers['x-hyperaccts-token']))return send(res,403,{ok:false,message:'Refresh HyperAccts and retry.'});
+      const input=await body(req,65536);
+      let messages;
+      try{messages=validateMessages(input?.messages);}catch(error){return send(res,400,{ok:false,message:error.message});}
+      try{return send(res,200,await assistant.chat(messages));}
+      catch(error){return send(res,502,{ok:false,message:error.message});}
+    }
     if(req.method==='GET'&&url.pathname==='/api/pva/status'){
       try{
         const [platforms,campaigns]=await Promise.all(['/platform/list','/campaign/list'].map(async route=>{const r=await fetch('http://127.0.0.1:52636/api'+route,{signal:AbortSignal.timeout(5000),redirect:'error'});if(!r.ok)throw new Error('Legacy API request failed');return r.json();}));
@@ -50,7 +60,7 @@ const server=http.createServer(async(req,res)=>{
           if(!r.ok||!match)return send(res,200,{ok:false,message:'The SMS provider did not accept the balance request. Check the API key and compatibility with its handler API.'});
           balance=Number(match[1]);
         }
-        const credentialRef=existing?input.credentialRef:randomUUID();secrets.set(credentialRef,{provider,apiKey});
+        const credentialRef=existing===apiKey?input.credentialRef:randomUUID();secrets.set(credentialRef,{provider,apiKey});
         return send(res,200,{ok:true,credentialRef,balance,checkedAt:new Date().toISOString(),message:'Provider connection verified. No number was purchased and no CAPTCHA task was submitted.'});
       }catch{return send(res,200,{ok:false,message:'Could not reach the provider. Check your connection and retry.'});}
     }

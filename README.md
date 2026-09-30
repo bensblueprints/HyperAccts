@@ -10,6 +10,24 @@ See [current blockers and implementation handoff](docs/BLOCKERS.md) for the requ
 
 Included: campaign creation and editing, strict mock CSV import, simulation controls, per-record results, failed-record retry, export, local persistence, demo solution unlocks, version snapshots, creator step editor, connector requirements, SMSPVA / DaisySMS / 2Captcha profiles and balance-check adapters, and a public product website.
 
+This source revision also includes an **AI assistant** backed by Ollama: chat, validated workflow drafts, and explicit review in Creator studio. It does not enable live campaign execution. The public 0.1.0 installer does not contain these changes yet.
+
+## AI assistant
+
+Start Ollama with the desired model loaded. Configure the desktop service before launch:
+
+```powershell
+$env:HYPERACCTS_OLLAMA_URL = 'http://127.0.0.1:11434'
+$env:HYPERACCTS_AI_MODEL = 'huihui_ai/qwen3-coder-next-abliterated:latest'
+npm start
+```
+
+For a private remote Ollama server, replace the URL with its reachable private origin (or an SSH-forwarded loopback port). These environment variables also apply to `npm run desktop`. The server reads configuration at startup; `.env` is not loaded automatically. Do not expose Ollama publicly.
+
+Open **AI assistant → Check connection**, then describe the workflow. **Review draft in Creator studio** opens the generated fields for editing; save or publish explicitly. Chat remains in memory for this window, while saved drafts use the existing workspace storage. Only chat messages are sent to Ollama: campaign records and connector credentials are not attached. The adapter accepts no executable model actions. DeepSeek is not integrated.
+
+The integration uses Ollama's [chat API](https://docs.ollama.com/api/chat) and [structured outputs](https://docs.ollama.com/capabilities/structured-outputs), with independent response validation before drafts reach the editor.
+
 Planned platform coverage: Gmail, YouTube, Outlook, Facebook, Reddit, Instagram, Amazon, Apple accounts and Apple Developer enrollment, Google accounts and Google Play Console enrollment. Actual inspected legacy coverage varies; see [audit](docs/AUDIT.md).
 
 ## Develop
