@@ -2,16 +2,20 @@ import http from 'node:http';
 import {readFile} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
 import path from 'node:path';
+import os from 'node:os';
 import {randomBytes,randomUUID,timingSafeEqual} from 'node:crypto';
+import {createWorkspaceStore} from './desktop/workspace-store.mjs';
+import {validateWorkspace,WorkspaceValidationError,MAX_WORKSPACE_BYTES} from './workspace-schema.mjs';
 
 const root=path.dirname(fileURLToPath(import.meta.url));
-export function createAppServer({port=4173,fetchProvider=fetch}={}){
+export function createAppServer({port=4173,fetchProvider=fetch,workspaceDirectory=null}={}){
 const token=randomBytes(32).toString('hex');
 const secrets=new Map();
-const allowedFiles=new Set(['index.html','styles.css','app.mjs','domain.mjs','market.mjs','connectors.mjs','README.md','docs/PRODUCT.md','docs/AUDIT.md','docs/ARCHITECTURE.md','audit-evidence.json']);
+const workspace=workspaceDirectory?createWorkspaceStore(workspaceDirectory,{validate:validateWorkspace}):null;
+const allowedFiles=new Set(['index.html','styles.css','app.mjs','domain.mjs','market.mjs','connectors.mjs','workspace-schema.mjs','workspace-client.mjs','README.md','docs/PRODUCT.md','docs/AUDIT.md','docs/ARCHITECTURE.md','audit-evidence.json']);
 const mime={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.json':'application/json; charset=utf-8','.md':'text/plain; charset=utf-8'};
 function send(res,status,data){res.writeHead(status,{'content-type':'application/json; charset=utf-8','cache-control':'no-store','x-content-type-options':'nosniff'});res.end(JSON.stringify(data));}
-async function body(req){let chunks=[],length=0;for await(const chunk of req){length+=chunk.length;if(length>16384)throw new Error('Request too large');chunks.push(chunk);}return JSON.parse(Buffer.concat(chunks).toString()||'{}');}
+async function body(req,limit=16384){let chunks=[],length=0;for await(const chunk of req){length+=chunk.length;if(length>limit)throw new Error('Request too large');chunks.push(chunk);}return JSON.parse(Buffer.concat(chunks).toString()||'{}');}
 function validToken(value){if(typeof value!=='string'||value.length!==token.length)return false;return timingSafeEqual(Buffer.from(value),Buffer.from(token));}
 const server=http.createServer(async(req,res)=>{
   const hosts=[`127.0.0.1:${port}`,`localhost:${port}`];
@@ -20,6 +24,21 @@ const server=http.createServer(async(req,res)=>{
   const url=new URL(req.url,`http://127.0.0.1:${port}`);
   try{
     if(req.method==='GET'&&url.pathname==='/api/session')return send(res,200,{csrf:token});
+    if(url.pathname==='/api/workspace'){
+      if(!['GET','PUT'].includes(req.method))return send(res,405,{ok:false,message:'Use GET to read or PUT to save a workspace.'});
+      if(req.method==='PUT'&&!validToken(req.headers['x-hyperaccts-token']))return send(res,403,{ok:false,message:'Refresh HyperAccts and retry the save.'});
+      if(!workspace)return send(res,req.method==='GET'?200:503,{ok:req.method==='GET',enabled:false,state:null,message:'Desktop storage is not configured for this preview.'});
+      try{
+        if(req.method==='GET')return send(res,200,{ok:true,enabled:true,...await workspace.read()});
+        const input=validateWorkspace(await body(req,MAX_WORKSPACE_BYTES));
+        await workspace.write(input);
+        return send(res,200,{ok:true,enabled:true,savedAt:new Date().toISOString()});
+      }catch(error){
+        if(error.code==='WORKSPACE_VERSION_UNSUPPORTED')return send(res,409,{ok:false,enabled:true,message:error.message});
+        const invalid=error instanceof WorkspaceValidationError||error instanceof SyntaxError;
+        return send(res,error.message==='Request too large'?413:invalid?400:503,{ok:false,enabled:true,message:invalid?error.message:error.message==='Request too large'?'Choose a workspace smaller than 4 MiB.':'Workspace storage could not be read or saved. Check disk space and folder permissions, then retry or restore a backup. Existing recovery files are retained.'});
+      }
+    }
     if(req.method==='GET'&&url.pathname==='/api/pva/status'){
       try{
         const [platforms,campaigns]=await Promise.all(['/platform/list','/campaign/list'].map(async route=>{const r=await fetch('http://127.0.0.1:52636/api'+route,{signal:AbortSignal.timeout(5000),redirect:'error'});if(!r.ok)throw new Error('Legacy API request failed');return r.json();}));
@@ -64,14 +83,14 @@ const server=http.createServer(async(req,res)=>{
 server.on('close',()=>secrets.clear());
 return server;
 }
-export async function startServer(port=4173){
-  const server=createAppServer({port});
+export async function startServer(port=4173,options={}){
+  const server=createAppServer({...options,port});
   await new Promise((resolve,reject)=>{server.once('error',reject);server.listen(port,'127.0.0.1',resolve);});
   return server;
 }
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
   const port=Number(process.env.PORT||4173);
-  const server=await startServer(port);
+  const server=await startServer(port,{workspaceDirectory:process.env.HYPERACCTS_DATA_DIR||path.join(os.homedir(),'.hyperaccts','workspace')});
   console.log(`HyperAccts is ready at http://127.0.0.1:${port}`);
   process.on('SIGTERM',()=>server.close());
 }

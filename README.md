@@ -4,7 +4,7 @@ A Windows desktop workspace for campaign workflows, reusable solutions, and a cr
 
 ## Preview status
 
-Version 0.1.0 is an interactive product prototype, not a complete replacement execution engine. Campaign runs, solution purchases, and creator publishing are local simulations. No real accounts are created. There is no public marketplace backend or payment processing yet.
+Version 0.1.1 is an interactive product prototype with durable workspace storage, not a complete replacement execution engine. Campaign runs, solution purchases, and creator publishing are local simulations. No real accounts are created. There is no public marketplace backend or payment processing yet.
 
 See [current blockers and implementation handoff](docs/BLOCKERS.md) for the requested live-mode, DeepSeek, proxy-import, account-inventory and sales features, the assistance scope boundary, and release/CI limitations.
 
@@ -43,3 +43,14 @@ Provider balance-check requests can reach real services when explicitly tested. 
 Only the `website` directory is public. Desktop application routes and provider APIs are not deployed to the public site. `deploy/hyperaccts.nginx.conf` configures an isolated Nginx hostname at `/srv/hyperaccts/website`. Copy release installers into its `downloads` folder. The domain needs Cloudflare DNS records pointing to the Hetzner server, then an origin TLS certificate before using Cloudflare Full (strict). Never use Flexible SSL as the final configuration.
 
 See [architecture](docs/ARCHITECTURE.md), [product scope](docs/PRODUCT.md), and [deployment](docs/DEPLOYMENT.md).
+## Desktop workspace reliability (0.1.1 preview)
+
+Open **Workspace settings** to see save status, export a JSON backup, or review and restore a backup. Existing version 1 browser data is migrated when durable storage is available. A running simulation reopens paused.
+
+The Electron app stores `workspace.json` and `workspace.backup.json` under `workspace` in Electron's user-data directory. Writes are ordered, flushed and atomically replaced. Corrupt files are retained with unique names. Both workspace files and exports are unencrypted; provider keys and ephemeral connection-test references are excluded. The app remains a simulation workspace.
+
+For an isolated development workspace, set `HYPERACCTS_DATA_DIR` before `npm start`. Without that override the development service uses `~/.hyperaccts/workspace`. A server created without a workspace directory offers browser-only preview storage. Use a single desktop workspace session; this is not a concurrent multiuser database.
+
+For a separate desktop smoke test, create an empty profile directory and set `HYPERACCTS_PROFILE_DIR` to that directory and `HYPERACCTS_DESKTOP_PORT` to an unused local port before launching. The normal desktop defaults remain unchanged; a separate profile/port does not migrate another profile's browser data.
+
+Run `npm ci`, `npm test`, and `npm run build:win` on Windows. Version 0.1.1 produces an unsigned setup installer and portable preview under `dist`. The public 0.1.0 download remains separate.
