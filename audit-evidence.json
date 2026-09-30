@@ -1,0 +1,1619 @@
+{
+  "date": "2026-09-30",
+  "version": "6.8.5",
+  "baseUrl": "http://localhost:52636/api",
+  "authentication": "Tested platform/list, campaign/list, campaign/create, campaign/details, account/list and account/add without an API key; no key was required for these calls.",
+  "catalogCount": 213,
+  "platforms": {
+    "isSuccess": true,
+    "data": [
+      {
+        "Name": "Outlook",
+        "DisplayName": "Outlook",
+        "Status": "Available"
+      },
+      {
+        "Name": "Twitter",
+        "DisplayName": "Twitter",
+        "Status": "Available"
+      },
+      {
+        "Name": "Gmail_Bypass_QR_Code",
+        "DisplayName": "Gmail Bypass QR Code",
+        "Status": "Unvailable"
+      }
+    ],
+    "message": null
+  },
+  "catalog": [
+    {
+      "Name": "Amazon",
+      "ClassName": "Amazon",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "AmazonPrime",
+      "ClassName": "AmazonPrime",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Facebook",
+      "ClassName": null,
+      "ModelStatus": 0,
+      "RegisteredType": 4,
+      "AccountType": 3
+    },
+    {
+      "Name": "Facebook_",
+      "ClassName": "Facebook",
+      "ModelStatus": 0,
+      "RegisteredType": 4,
+      "AccountType": 3
+    },
+    {
+      "Name": "Gmail",
+      "ClassName": "Gmail",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 1
+    },
+    {
+      "Name": "Instagram",
+      "ClassName": "Instagram",
+      "ModelStatus": 0,
+      "RegisteredType": 4,
+      "AccountType": 0
+    },
+    {
+      "Name": "LinkedIn",
+      "ClassName": "LinkedIn",
+      "ModelStatus": 0,
+      "RegisteredType": 4,
+      "AccountType": 0
+    },
+    {
+      "Name": "Outlook",
+      "ClassName": "Outlook",
+      "ModelStatus": 0,
+      "RegisteredType": 4,
+      "AccountType": 1
+    },
+    {
+      "Name": "Pinterest",
+      "ClassName": "Pinterest",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Reddit",
+      "ClassName": "Reddit",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Slickdeals",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Twitter",
+      "ClassName": "Twitter",
+      "ModelStatus": 0,
+      "RegisteredType": 4,
+      "AccountType": 0
+    },
+    {
+      "Name": "YouTube",
+      "ClassName": "YouTube",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "SoundCloud",
+      "ClassName": "SoundCloud",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Mail_RU",
+      "ClassName": "MailRU",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 1
+    },
+    {
+      "Name": "Yahoo",
+      "ClassName": "Yahoo",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 1
+    },
+    {
+      "Name": "PinterestBusiness",
+      "ClassName": "PinterestBusiness",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Minerfarm",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Nike",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "WEB_DE",
+      "ClassName": "WEB_DE",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 1
+    },
+    {
+      "Name": "MapleStory",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Quora",
+      "ClassName": "Quora",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Thrvly",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Nexon",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "InstagramCheck",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "NikeHK",
+      "ClassName": "NikeHK",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Hemlane",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "kijiji",
+      "ClassName": "KJJ",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Spotify",
+      "ClassName": "Spotify",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Naver",
+      "ClassName": "Naver",
+      "ModelStatus": 0,
+      "RegisteredType": 2,
+      "AccountType": 0
+    },
+    {
+      "Name": "Mail_COM",
+      "ClassName": "MailCOM",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 1
+    },
+    {
+      "Name": "craigslist",
+      "ClassName": "Craigslist",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "QQ",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "AppleID",
+      "ClassName": "AppleId",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "DIGITEX",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "AOL",
+      "ClassName": "Yahoo",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 1
+    },
+    {
+      "Name": "Roblox",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Napster",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Yandex",
+      "ClassName": "Yandex",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 1
+    },
+    {
+      "Name": "MapleSEA",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Runbox",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "GMX_NET",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 1
+    },
+    {
+      "Name": "YandexRU",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "YahooPOP",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Dailymotion",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 1
+    },
+    {
+      "Name": "1688.com",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Auto.RU",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Avito",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Badoo",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "BurgerKing",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "COM.NU",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Carousell",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Drom.RU",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Drug Vokrug",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Fiverr",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Fotostrana",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "GetTaxi",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "GrabTaxi",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "ICQ",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "KakaoTalk",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Line Messenger",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Lukoil-Garant",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Lyft",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "MS",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Bing",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "MeetMe",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Nimses",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "OD",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "OLX",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "OTHER",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Office365",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Qiwi",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Rambler",
+      "ClassName": "Rambler",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Royal Canin",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "SEOsprint.net",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Sipnet.ru",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Steam",
+      "ClassName": "SteamBox",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Talk2",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "TaoBao",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Taxi Maksim",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Telegram",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "The Insiders",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Tinder",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Tinkoff",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Twilio",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Ubank.ru",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Uber",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Viber",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "WeChat",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "WebMoney",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Weebly",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "WhatsAPP",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Yandex Taxi",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Zalo",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "dodopizza.ru",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "like4u",
+      "ClassName": "",
+      "ModelStatus": 2,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Yahoo_Nexon",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Gmail_Nexon",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "RediffEditor",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "TwitterRecover",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "EbuyHouse",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Nike_US",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Nimo_TV",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 2,
+      "AccountType": 0
+    },
+    {
+      "Name": "Lvsvietnam",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Dailoc68",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "PayPal",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Coinpot_co",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Pornhub",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Pinterest_Profile",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "TicketMaster",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "SpotifyCheck",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Macao79",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Hoanggia99",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "landingpage",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Gamezer",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "TwitterT",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 4,
+      "AccountType": 0
+    },
+    {
+      "Name": "TwitterF",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 4,
+      "AccountType": 0
+    },
+    {
+      "Name": "TwitterF_USA",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 4,
+      "AccountType": 0
+    },
+    {
+      "Name": "Ebay",
+      "ClassName": "Ebay",
+      "ModelStatus": 0,
+      "RegisteredType": 4,
+      "AccountType": 0
+    },
+    {
+      "Name": "SpotifyPremium",
+      "ClassName": "Spotify",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Netflix",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Pathofexile",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Freenet_de",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Sony",
+      "ClassName": "Sony",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Spotify_byom_de",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Travian",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Mercadopago",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Mercadopago_validation",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Tripadvisor",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Petitfute",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Pagesjaunes_fr",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Deezer",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 1
+    },
+    {
+      "Name": "YandexRecover",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Ebay_COM",
+      "ClassName": "Ebay",
+      "ModelStatus": 0,
+      "RegisteredType": 4,
+      "AccountType": 0
+    },
+    {
+      "Name": "Checkpeople",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Amazon_ca",
+      "ClassName": "Amazon",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Mturk",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Rambler_Open",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Outlook_Rule",
+      "ClassName": "Outlook",
+      "ModelStatus": 0,
+      "RegisteredType": 4,
+      "AccountType": 1
+    },
+    {
+      "Name": "AmazonUK",
+      "ClassName": "Amazon",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "AmazonFR",
+      "ClassName": "Amazon",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "AmazonDE",
+      "ClassName": "Amazon",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "PayPal_India",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "NikeCheck",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "RuneScape",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "CDP_NET",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Facebook_Business",
+      "ClassName": "Facebook",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "DeezerPremium",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "AWS",
+      "ClassName": "AWS",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Amazon_Mturk",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Chaturbate",
+      "ClassName": "Chaturbate",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Coinsniper",
+      "ClassName": "Coinsniper",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Poshmark",
+      "ClassName": "Poshmark",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Yandex_Spotify",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Battle_Net",
+      "ClassName": "Battle_Net",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "AmazonSA",
+      "ClassName": "Amazon",
+      "ModelStatus": 0,
+      "RegisteredType": 2,
+      "AccountType": 0
+    },
+    {
+      "Name": "Amazon_Business",
+      "ClassName": "Amazon",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Linkedin_LX",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Ebay-kleinanzeigen_de",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "AmazonUK_Music",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Nespresso",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Gmail_RentNumber",
+      "ClassName": "Gmail",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 1
+    },
+    {
+      "Name": "Nespresso_NL",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "VK",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "Gmail_2StepVerification",
+      "ClassName": "Gmail",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 1
+    },
+    {
+      "Name": "Outlook_BindPhone",
+      "ClassName": "Outlook",
+      "ModelStatus": 0,
+      "RegisteredType": 4,
+      "AccountType": 1
+    },
+    {
+      "Name": "Discord",
+      "ClassName": "Discord",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "GmailForward",
+      "ClassName": "Gmail",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 1
+    },
+    {
+      "Name": "Gmail_ResetPassword",
+      "ClassName": "Gmail",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 1
+    },
+    {
+      "Name": "Gmail_2FA_AppPwd",
+      "ClassName": "Gmail",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 1
+    },
+    {
+      "Name": "WeiBo",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 1
+    },
+    {
+      "Name": "Coingecko",
+      "ClassName": "Coingecko",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 1
+    },
+    {
+      "Name": "Coinmarketcap",
+      "ClassName": "Coinmarketcap",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 1
+    },
+    {
+      "Name": "Gmass",
+      "ClassName": "Gmail",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 1
+    },
+    {
+      "Name": "Yahoofetchemail",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 1
+    },
+    {
+      "Name": "DiscordToken",
+      "ClassName": "Discord",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Backblaze",
+      "ClassName": "Backblaze",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "OutlookForward",
+      "ClassName": "Outlook",
+      "ModelStatus": 0,
+      "RegisteredType": 4,
+      "AccountType": 1
+    },
+    {
+      "Name": "TikTok",
+      "ClassName": "TikTok",
+      "ModelStatus": 0,
+      "RegisteredType": 4,
+      "AccountType": 1
+    },
+    {
+      "Name": "Gmail_Comment",
+      "ClassName": "Gmail",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 1
+    },
+    {
+      "Name": "OutlookEmailLogin",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 4,
+      "AccountType": 1
+    },
+    {
+      "Name": "Sephora",
+      "ClassName": "Sephora",
+      "ModelStatus": 0,
+      "RegisteredType": 4,
+      "AccountType": 1
+    },
+    {
+      "Name": "GmailFor",
+      "ClassName": "GmailFor",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 1
+    },
+    {
+      "Name": "KJJ",
+      "ClassName": "KJJ",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Sonys",
+      "ClassName": "Sony",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "Beatport",
+      "ClassName": "Beatport",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "coopculture",
+      "ClassName": "coopculture",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "uefa",
+      "ClassName": "UEFA",
+      "ModelStatus": 0,
+      "RegisteredType": 1,
+      "AccountType": 0
+    },
+    {
+      "Name": "LinkedInCheck",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 4,
+      "AccountType": 0
+    },
+    {
+      "Name": "GmailService",
+      "ClassName": "GmailService",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 1
+    },
+    {
+      "Name": "RamblerTo",
+      "ClassName": "RamblerTo",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "facebook_phone",
+      "ClassName": "Facebook",
+      "ModelStatus": 0,
+      "RegisteredType": 4,
+      "AccountType": 3
+    },
+    {
+      "Name": "LinkedinChangePassword2FA",
+      "ClassName": "LinkedIn",
+      "ModelStatus": 0,
+      "RegisteredType": 4,
+      "AccountType": 0
+    },
+    {
+      "Name": "OutLookAndEabyDeveloper",
+      "ClassName": "Outlook",
+      "ModelStatus": 0,
+      "RegisteredType": 4,
+      "AccountType": 1
+    },
+    {
+      "Name": "OutLookAndEabyDeveloperLogin",
+      "ClassName": "Outlook",
+      "ModelStatus": 0,
+      "RegisteredType": 4,
+      "AccountType": 1
+    },
+    {
+      "Name": "NexonTo",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 4,
+      "AccountType": 1
+    },
+    {
+      "Name": "MaplestoryTo",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 4,
+      "AccountType": 1
+    },
+    {
+      "Name": "EA",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 4,
+      "AccountType": 1
+    },
+    {
+      "Name": "Audiomack",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 4,
+      "AccountType": 1
+    },
+    {
+      "Name": "GoogleVoice",
+      "ClassName": "Gmail",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 1
+    },
+    {
+      "Name": "ProdPmDrive",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 4,
+      "AccountType": 1
+    },
+    {
+      "Name": "GMX_COM",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 4,
+      "AccountType": 1
+    },
+    {
+      "Name": "Office365To",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 4,
+      "AccountType": 1
+    },
+    {
+      "Name": "NetfixTo",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 4,
+      "AccountType": 1
+    },
+    {
+      "Name": "ProfileMD",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 4,
+      "AccountType": 1
+    },
+    {
+      "Name": "amazon_delete_number",
+      "ClassName": "Amazon",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 0
+    },
+    {
+      "Name": "OutlookDownloadEmail",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 1
+    },
+    {
+      "Name": "Voip",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 4,
+      "AccountType": 1
+    },
+    {
+      "Name": "MercadopagoPro",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 4,
+      "AccountType": 1
+    },
+    {
+      "Name": "Google_Login_AddRecoverEmail_ChangePassword",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 1
+    },
+    {
+      "Name": "Gmail_Bypass_QR_Code",
+      "ClassName": "Gmail",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 1
+    },
+    {
+      "Name": "CreateGmailwithExistingEmail",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 1
+    },
+    {
+      "Name": "milanuncios",
+      "ClassName": "",
+      "ModelStatus": 0,
+      "RegisteredType": 0,
+      "AccountType": 1
+    }
+  ],
+  "createTests": [
+    {
+      "operation": "create-empty-campaign",
+      "platform": "Outlook",
+      "response": {
+        "isSuccess": true,
+        "data": {
+          "Name": "UX_AUDIT_MOCK_Outlook_20260930",
+          "DisplayName": "UX_AUDIT_MOCK_Outlook_20260930",
+          "Platform": "Outlook",
+          "PlatformDisplayName": "Outlook",
+          "Status": "Stop"
+        },
+        "message": null
+      }
+    },
+    {
+      "operation": "create-empty-campaign",
+      "platform": "Twitter",
+      "response": {
+        "isSuccess": true,
+        "data": {
+          "Name": "UX_AUDIT_MOCK_Twitter_20260930",
+          "DisplayName": "UX_AUDIT_MOCK_Twitter_20260930",
+          "Platform": "Twitter",
+          "PlatformDisplayName": "Twitter",
+          "Status": "Stop"
+        },
+        "message": null
+      }
+    }
+  ],
+  "readTests": [
+    {
+      "route": "/campaign/details?name=UX_AUDIT_MOCK_Outlook_20260930",
+      "response": {
+        "isSuccess": true,
+        "data": {
+          "Name": "UX_AUDIT_MOCK_Outlook_20260930",
+          "DisplayName": "UX_AUDIT_MOCK_Outlook_20260930",
+          "Platform": "Outlook",
+          "PlatformDisplayName": "Outlook",
+          "Status": "Stop"
+        },
+        "message": null
+      }
+    },
+    {
+      "route": "/account/list?campaignName=UX_AUDIT_MOCK_Outlook_20260930&page=1",
+      "response": {
+        "isSuccess": false,
+        "data": null,
+        "message": "Campaign not found"
+      }
+    },
+    {
+      "route": "/campaign/details?name=UX_AUDIT_MOCK_Twitter_20260930",
+      "response": {
+        "isSuccess": true,
+        "data": {
+          "Name": "UX_AUDIT_MOCK_Twitter_20260930",
+          "DisplayName": "UX_AUDIT_MOCK_Twitter_20260930",
+          "Platform": "Twitter",
+          "PlatformDisplayName": "Twitter",
+          "Status": "Stop"
+        },
+        "message": null
+      }
+    },
+    {
+      "route": "/account/list?campaignName=UX_AUDIT_MOCK_Twitter_20260930&page=1",
+      "response": {
+        "isSuccess": false,
+        "data": null,
+        "message": "Campaign not found"
+      }
+    }
+  ],
+  "accountTests": [
+    {
+      "test": "add-mock-account",
+      "platform": "Outlook",
+      "response": {
+        "isSuccess": false,
+        "data": null,
+        "message": "Campaign not found"
+      }
+    },
+    {
+      "test": "add-mock-account",
+      "platform": "Twitter",
+      "response": {
+        "isSuccess": false,
+        "data": null,
+        "message": "Campaign not found"
+      }
+    }
+  ]
+}

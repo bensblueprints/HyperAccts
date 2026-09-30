@@ -1,0 +1,11 @@
+# Architecture
+
+The Electron main process starts a loopback-only HTTP service. The sandboxed renderer has context isolation and no Node access. External navigation is restricted to known provider documentation domains and the product domain. The app allows one instance and uses a stable local origin so browser storage persists between launches.
+
+`domain.mjs` contains mock records, CSV validation and the campaign state machine. `market.mjs` defines local listings, unlocks and immutable snapshots. `connectors.mjs` defines provider profiles and required capabilities. `app.mjs` renders the workspace. `server.mjs` exposes only allowlisted static resources, a read-only legacy status check, and provider balance checks.
+
+The service validates Host and Origin, requires a per-session token for key-bearing POST requests, sets a restrictive content security policy, bounds request bodies and uses fixed provider endpoints. Keys are held in memory and cleared on service shutdown. They never enter localStorage or campaign exports. Opaque references are scoped to the provider. API responses expose sanitized status rather than raw upstream payloads.
+
+Workspace state uses localStorage in this prototype. It is neither encrypted nor a multiuser database. Running simulations recover as paused after reopening. Provider credentials must be entered again after closing the app. Do not use the preview to store real account credentials.
+
+The public website is independent static HTML/CSS/JavaScript, served by the existing Hetzner Nginx. It contains no account API, provider key form, analytics or user submission collection. Its example campaign runs entirely in the browser. Its downloadable installers are built from the desktop package.

@@ -1,0 +1,53 @@
+{
+  "name": "hyperaccts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "HyperAccts campaign workspace and creator solution marketplace prototype",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "desktop": "electron .",
+    "build:win": "electron-builder --win nsis portable --x64 --publish never",
+    "website": "node website/server.mjs"
+  },
+  "devDependencies": {
+    "electron": "44.5.1",
+    "electron-builder": "26.15.3"
+  },
+  "main": "desktop/main.mjs",
+  "author": "HyperAccts",
+  "build": {
+    "appId": "com.hyperaccts.desktop",
+    "productName": "HyperAccts",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "index.html",
+      "styles.css",
+      "*.mjs",
+      "desktop/**",
+      "docs/**",
+      "README.md",
+      "audit-evidence.json",
+      "package.json"
+    ],
+    "win": {
+      "icon": "desktop/icon.ico",
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "HyperAccts-Setup-${version}.${ext}"
+    },
+    "portable": {
+      "artifactName": "HyperAccts-Portable-${version}.${ext}"
+    }
+  }
+}
