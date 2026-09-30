@@ -10,7 +10,7 @@ Target: the owner's existing Hetzner host. Nginx serves the public website from 
 4. Once DNS reaches this host, issue the origin certificate for the two names with the Nginx Certbot integration. Enable HTTPS redirection and verify both names.
 5. Enable Cloudflare proxying and use SSL/TLS **Full (strict)**. Enable Always Use HTTPS after origin HTTPS works.
 
-The domain was not resolving when this preview was prepared. A working HTTP virtual host does not mean that DNS or public HTTPS is complete.
+DNS and public HTTPS were verified on September 30, 2026. Both hyperaccts.com and www.hyperaccts.com return HTTP 200 over HTTPS, and HTTP redirects to HTTPS. Certbot installed the certificate and configured automatic renewal; the initial certificate expires December 29, 2026. Cloudflare proxying may now be enabled with Full (strict).
 
 ## Releases
 
