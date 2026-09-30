@@ -9,6 +9,7 @@ HyperAccts has three surfaces: a downloadable Windows workspace, a public produc
 - Pause, resume, stop, failed-record retry, results and event history.
 - Local marketplace unlocks and versioned workflow snapshots.
 - Creator metadata, step ordering, connector requirements and local publishing.
+- Ollama chat and validated workflow drafts, reviewed and saved through Creator studio.
 - SMSPVA, DaisySMS and 2Captcha connection profiles with real balance-check adapters.
 - Additional provider profiles marked mock-only.
 - A responsive public website with marketplace examples and an interactive mock run.
