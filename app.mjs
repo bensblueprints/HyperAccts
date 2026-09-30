@@ -1,6 +1,8 @@
 import {platforms,sampleRecords,parseCSV,validateCampaign,summary,transition,recoverCampaigns,makeCampaign} from './domain.mjs';
 import {initialSolutions,initialLicenses,stepKinds,validateSolution,unlockSolution,snapshotSolution} from './market.mjs';
 import {providers,initialConnections,validateConnection,mockConnectionCheck,checkRequirements} from './connectors.mjs';
+import {createApiClient} from './api-client.mjs';
+const post=createApiClient();
 
 const $=s=>document.querySelector(s),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const STORE='hyperaccts-v1';
@@ -21,8 +23,9 @@ function persist(){try{localStorage.setItem(STORE,JSON.stringify(state));return 
 persist();
 let page='campaigns',query='',filter='all',marketQuery='',marketGroup='all',wizardStep=0,draft=null,editingId=null,wizardErrors=[],detailId=null,creatorDraft=null,creatorErrors=[];
 let connection=null,checking=false;
-let connectorDraft=null,connectorErrors=[],connectorResult=null,connectorTesting=false,csrf=null;
-const labels={campaigns:'Campaigns',platforms:'Platforms',marketplace:'Marketplace',creators:'Creator studio',activity:'Activity',connectors:'Connectors',connections:'System status'};
+let connectorDraft=null,connectorErrors=[],connectorResult=null,connectorTesting=false;
+let aiMessages=[],aiDraft=null,aiBusy=false,aiError='',aiPrompt='',aiStatus=null;
+const labels={campaigns:'Campaigns',platforms:'Platforms',marketplace:'Marketplace',creators:'Creator studio',activity:'Activity',connectors:'Connectors',connections:'System status',assistant:'AI assistant'};
 function campaignIssues(c){return [...validateCampaign(c),...checkRequirements({requirements:c.requirements},state.connections,c.bindings||{}).map(message=>({field:'connectors',message}))];}
 function getP(id){return platforms.find(p=>p.id===id)||platforms[0];}
 function mark(p,large=false){return `<span class="platform-mark ${large?'large':''}" style="--platform-color:${p.color}">${esc(p.mark)}</span>`;}
@@ -38,8 +41,36 @@ function render(){
   document.querySelectorAll('[data-nav]').forEach(b=>b.classList.toggle('active',b.dataset.nav===page));
   $('#breadcrumb').innerHTML=`Workspace <span>/</span> ${labels[page]}`;
   $('#nav-count').textContent=state.campaigns.length;
-  const views={campaigns:campaignsView,platforms:platformsView,marketplace:marketplaceView,creators:creatorsView,activity:activityView,connectors:connectorsView,connections:connectionsView};
+  const views={campaigns:campaignsView,platforms:platformsView,marketplace:marketplaceView,creators:creatorsView,activity:activityView,connectors:connectorsView,connections:connectionsView,assistant:assistantView};
   $('#app').innerHTML=(storageIssue?`<div class="notice warn">${esc(storageIssue)}</div>`:'')+views[page]()+`<div class="footer-note">Prototype workspace · Simulated execution and purchases · No real accounts are created</div>`;
+}
+function assistantView(){
+  return heading('Plan your next workflow.','Ask questions or describe a workflow to create an editable draft.')+`
+    <div class="notice">Your messages go to the configured Ollama server. Chat stays in this window until you clear it or close the app. Keep passwords and provider keys out of chat.</div>
+    <section class="panel ai-panel"><div class="panel-head"><div><h2>Workflow assistant</h2><p id="ai-status" role="status">${esc(aiStatus?.message||'Check the model connection before starting.')}${aiStatus?.model?` · ${esc(aiStatus.model)}`:''}</p></div><button data-action="ai-status">Check connection</button></div>
+    <div class="ai-history" role="log" aria-live="polite">${aiMessages.length?aiMessages.map(m=>`<article class="ai-message"><b>${m.role==='user'?'You':'Assistant'}</b><p>${esc(m.content)}</p></article>`).join(''):'<p>Try: Draft a YouTube channel onboarding checklist with an owner review.</p>'}</div>
+    ${aiDraft?`<div class="notice"><b>${esc(aiDraft.title)}</b><p>${esc(aiDraft.description)}</p><button data-action="ai-draft">Review draft in Creator studio</button></div>`:''}
+    ${aiError?`<div class="notice warn" role="alert">${esc(aiError)}</div>`:''}
+    <form id="ai-form"><label for="ai-prompt">Your request</label><textarea id="ai-prompt" rows="4" maxlength="4000" required ${aiBusy?'disabled':''}>${esc(aiPrompt)}</textarea><div class="ai-actions"><button type="button" data-action="ai-clear" ${aiBusy?'disabled':''}>Clear chat</button><button class="primary" type="submit" ${aiBusy?'disabled':''}>${aiBusy?'Thinking…':'Send request'}</button></div></form>
+    <p class="field-hint">Drafts require your review. Campaign execution remains simulated.</p></section>`;
+}
+async function sendAssistant(){
+  if(aiBusy||!aiPrompt.trim())return;
+  const prompt=aiPrompt.trim();
+  const history=aiMessages.slice(-10);
+  while(history.reduce((n,m)=>n+m.content.length,0)+prompt.length>12000)history.shift();
+  aiBusy=true;aiError='';aiDraft=null;aiMessages.push({role:'user',content:prompt});aiPrompt='';render();
+  try{
+    const result=await post('/api/ai/chat',{messages:[...history,{role:'user',content:prompt}]});
+    aiMessages.push({role:'assistant',content:result.reply});aiDraft=result.draft;
+    aiMessages=aiMessages.slice(-40);
+  }catch(error){aiError=error.message;aiPrompt=prompt;aiMessages.pop();}
+  finally{aiBusy=false;if(page==='assistant')render();}
+}
+async function checkAssistant(){
+  try{const r=await fetch('/api/ai/status');if(!r.ok)throw new Error();aiStatus=await r.json();}
+  catch{aiStatus={ok:false,message:'The local service could not be reached.'};}
+  if(page==='assistant')render();
 }
 function campaignsView(){
   const running=state.campaigns.filter(c=>c.status==='running').length;
@@ -67,23 +98,28 @@ function connectorsView(){
   `<div class="notice">SMSPVA, DaisySMS, and 2Captcha support live API-key and balance checks. Campaign runs remain simulations. Other provider profiles are mock-only until their adapters are implemented.</div><section class="panel"><div class="panel-head"><h2>Your connections</h2><span class="badge">Workspace owned</span></div><div class="table-scroll"><table><thead><tr><th>CONNECTION</th><th>PROVIDER</th><th>MODE</th><th>LAST CHECK</th><th></th></tr></thead><tbody>${state.connections.map(c=>{const p=providers.find(p=>p.id===c.provider);return `<tr><td><b>${esc(c.name)}</b><div class="creator-by">${p.category}${c.country?' · '+esc(c.country):''}</div></td><td>${p.name}</td><td>${badge(c.mode==='mock'?'Demo':'Balance check only')}</td><td>${c.checkedAt?`${c.mode==='mock'?'Mock check':`Balance: ${esc(c.balance)}`}<div class="creator-by">${when(c.checkedAt)} ${time(c.checkedAt)}</div>`:'Not tested'}</td><td><button data-action="connector-edit" data-id="${c.id}">Configure</button></td></tr>`;}).join('')}</tbody></table></div></section><h2 style="margin:30px 0 18px">Provider library</h2><div class="solution-grid">${[...providers].sort((a,b)=>(['smspva','daisysms','2captcha'].includes(b.id)?1:0)-(['smspva','daisysms','2captcha'].includes(a.id)?1:0)).map(p=>`<article class="solution-card"><div class="platform-title"><span class="platform-mark large" style="--platform-color:${p.category==='SMS'?'#36856a':'#7b699f'}">${p.mark}</span><div><h3>${p.name}</h3><div class="creator-by">${p.category} ${['smspva','daisysms','2captcha'].includes(p.id)?'· Your default':''}</div></div></div><p>${esc(p.description)}</p><div class="card-evidence">${esc(p.source)}<br>${['smspva','daisysms','2captcha'].includes(p.id)?'Live balance-check adapter included':'Mock profile only; live adapter pending'}</div><div class="solution-meta">${p.docs?`<a href="${p.docs}" target="_blank" rel="noopener" style="font-size:11px">Provider docs ↗</a>`:'<small>API contract unverified</small>'}<button data-action="connector-provider" data-id="${p.id}">Set up</button></div></article>`).join('')}</div>`;
 }
 function openConnector(id=null,provider='smspva'){
+  if(connectorTesting){toast('Wait for the connection check to finish.');return;}
   connectorDraft=id?structuredClone(state.connections.find(c=>c.id===id)):{id:crypto.randomUUID(),provider,name:providers.find(p=>p.id===provider).name+' connection',country:'United States',budget:5,timeout:180,mode:'mock',status:'untested'};
   connectorErrors=[];connectorResult=null;renderConnector();$('#connector-editor').showModal();
 }
 function renderConnector(){const c=connectorDraft,p=providers.find(p=>p.id===c.provider),live=['smspva','daisysms','2captcha'].includes(p.id);$('#connector-editor').innerHTML=`<div class="modal-head"><div><h2 id="connector-title">${p.name} connector</h2><p>${p.category} · Your workspace, your credentials</p></div><button class="close-btn" data-action="close-connector" aria-label="Close connector editor">×</button></div><div class="modal-body"><div class="form-grid"><label>Connection name<input data-connection="name" value="${esc(c.name)}"></label><label>Mode<select data-connection="mode"><option value="mock" ${c.mode==='mock'?'selected':''}>Mock connection</option>${live?`<option value="balance-only" ${c.mode==='balance-only'?'selected':''}>Live API / balance check only</option>`:''}</select></label>${p.category==='SMS'?`<label>Preferred country<select data-connection="country">${['United States','United Kingdom','Vietnam','Canada','Germany','France','India','Indonesia'].map(v=>`<option ${c.country===v?'selected':''}>${v}</option>`).join('')}</select></label>`:''}<label>Planned spend limit (USD)<input data-connection="budget" type="number" min="0" max="10000" step="0.5" value="${c.budget}"><span class="field-hint">Saved preference; no spending is enabled in this prototype.</span></label><label>Planned wait timeout (seconds)<input data-connection="timeout" type="number" min="10" max="600" value="${c.timeout}"></label>${c.mode==='balance-only'?`<label class="full">API key<input id="provider-api-key" type="password" autocomplete="off" spellcheck="false" placeholder="${c.credentialRef?'Enter again after a server restart, or leave blank to reuse this session':'Paste your '+p.name+' API key'}"><span class="field-hint">Kept in local server memory for this session. Never saved in browser storage, a solution, or GitHub.</span></label>`:''}</div><div class="notice">${c.mode==='mock'?'Mock checks validate the profile without contacting a provider.':'Test connection sends the key directly through your local HyperAccts server to '+p.name+' to read the balance only. It does not order numbers or submit CAPTCHA tasks.'}</div>${connectorErrors.length?`<ul class="error-list">${connectorErrors.map(e=>`<li>${esc(e)}</li>`).join('')}</ul>`:''}<div id="connector-check-result">${connectorResult?`<div class="notice ${connectorResult.ok?'':'warn'}">${esc(connectorResult.message)}${connectorResult.ok&&typeof connectorResult.balance==='number'?`<br>Provider balance: <b>${connectorResult.balance}</b>`:''}</div>`:''}</div></div><div class="modal-footer"><small>${live?'Live balance check available':'Live provider adapter pending'}</small><div class="right"><button data-action="connector-test" ${connectorTesting?'disabled':''}>${connectorTesting?'Checking…':'Test connection'}</button><button class="primary" data-action="connector-save" ${connectorTesting?'disabled':''}>Save connection</button></div></div>`;}
 async function testConnector(){
+  if(connectorTesting)return;
   connectorErrors=validateConnection(connectorDraft);if(connectorErrors.length){renderConnector();return;}
+  const checkedDraft=connectorDraft;
+  const checkedMode=checkedDraft.mode;
   const apiKey=$('#provider-api-key')?.value||'';
   connectorTesting=true;renderConnector();
   try{
     if(connectorDraft.mode==='mock')connectorResult=mockConnectionCheck(connectorDraft);
-    else {if(!csrf){const r=await fetch('/api/session');csrf=(await r.json()).csrf;}
-      const r=await fetch(`/api/connectors/${connectorDraft.provider}/check`,{method:'POST',headers:{'content-type':'application/json','x-hyperaccts-token':csrf},body:JSON.stringify({apiKey,credentialRef:connectorDraft.credentialRef})});connectorResult=await r.json();}
+    else {connectorResult=await post(`/api/connectors/${checkedDraft.provider}/check`,{apiKey,credentialRef:checkedDraft.credentialRef});}
     if(connectorResult.ok){connectorDraft.checkedAt=connectorResult.checkedAt;connectorDraft.balance=connectorResult.balance;connectorDraft.status='checked';if(connectorResult.credentialRef)connectorDraft.credentialRef=connectorResult.credentialRef;}
-  }catch{connectorResult={ok:false,message:'The local connector service could not be reached. Start HyperAccts and retry.'};}
+  }catch(error){connectorResult={ok:false,message:error.message};}
+  if(!connectorResult.ok){connectorDraft.status='untested';delete connectorDraft.balance;delete connectorDraft.checkedAt;}
+  if(connectorDraft!==checkedDraft||connectorDraft.mode!==checkedMode){connectorResult=null;connectorDraft.status='untested';delete connectorDraft.balance;delete connectorDraft.checkedAt;}
   connectorTesting=false;renderConnector();
 }
-function saveConnector(){connectorErrors=validateConnection(connectorDraft);if(connectorErrors.length){renderConnector();return;}const i=state.connections.findIndex(c=>c.id===connectorDraft.id);if(i<0)state.connections.push(structuredClone(connectorDraft));else state.connections[i]=structuredClone(connectorDraft);persist();$('#connector-editor').close();nav('connectors');toast('Connection profile saved.');}
+function saveConnector(){if(connectorTesting){toast('Wait for the connection check to finish.');return;}connectorErrors=validateConnection(connectorDraft);if(connectorErrors.length){renderConnector();return;}const i=state.connections.findIndex(c=>c.id===connectorDraft.id);if(i<0)state.connections.push(structuredClone(connectorDraft));else state.connections[i]=structuredClone(connectorDraft);persist();$('#connector-editor').close();nav('connectors');toast('Connection profile saved.');}
 function openWizard(solutionId=null,campaignId=null){
   editingId=campaignId;wizardErrors=[];wizardStep=0;
   if(campaignId){draft=structuredClone(state.campaigns.find(c=>c.id===campaignId));if(['running','paused'].includes(draft.status))return toast('Stop the simulation before editing.');wizardStep=1;}
@@ -133,6 +169,9 @@ document.addEventListener('click',async e=>{
   const a=b.dataset.action,id=b.dataset.id;
   if(['start','pause','resume','stop','retry'].includes(a)){doTransition(id,a);return;}
   switch(a){
+    case'ai-status':await checkAssistant();break;
+    case'ai-clear':if(!aiBusy){aiMessages=[];aiDraft=null;aiError='';aiPrompt='';render();}break;
+    case'ai-draft':if(aiDraft){openCreator();Object.assign(creatorDraft,structuredClone(aiDraft),{price:0});renderCreator();}break;
     case'connector-new':openConnector();break;
     case'connector-provider':openConnector(null,id);break;
     case'connector-edit':openConnector(id);break;
@@ -173,9 +212,10 @@ document.addEventListener('click',async e=>{
 });
 document.addEventListener('input',e=>{
   const t=e.target;
+  if(t.id==='ai-prompt')aiPrompt=t.value;
   if(t.id==='campaign-search'){query=t.value;$('#campaign-table').innerHTML=campaignTable();}
   if(t.id==='market-search'){marketQuery=t.value;$('#solution-grid').innerHTML=marketCards();}
-  if(t.dataset.connection&&connectorDraft){connectorDraft[t.dataset.connection]=['budget','timeout'].includes(t.dataset.connection)?Number(t.value):t.value;if(t.dataset.connection==='mode'){connectorResult=null;connectorDraft.checkedAt=null;renderConnector();}}
+  if(t.dataset.connection&&connectorDraft){if(connectorTesting){renderConnector();return;}connectorDraft[t.dataset.connection]=['budget','timeout'].includes(t.dataset.connection)?Number(t.value):t.value;if(t.dataset.connection==='mode'){connectorResult=null;connectorDraft.status='untested';delete connectorDraft.checkedAt;delete connectorDraft.balance;delete connectorDraft.credentialRef;renderConnector();}}
   if(t.dataset.binding&&draft)draft.bindings[t.dataset.binding]=t.value;
   if(t.dataset.requirement&&creatorDraft){const req=new Set(creatorDraft.requirements||[]);t.checked?req.add(t.dataset.requirement):req.delete(t.dataset.requirement);creatorDraft.requirements=[...req];}
   if(t.id==='draft-name'&&draft)draft.name=t.value;
@@ -190,6 +230,7 @@ document.addEventListener('change',async e=>{
   if(t.id==='market-group'){marketGroup=t.value;$('#solution-grid').innerHTML=marketCards();}
   if(t.id==='csv-file'&&t.files[0]){try{if(t.files[0].size>1024*1024)throw new Error('Choose a CSV smaller than 1 MB.');draft.records=parseCSV(await t.files[0].text());wizardErrors=[];}catch(error){wizardErrors=[error.message];}renderWizard();}
 });
+document.addEventListener('submit',e=>{if(e.target.id==='ai-form'){e.preventDefault();void sendAssistant();}});
 window.addEventListener('hashchange',()=>{const p=location.hash.slice(1);if(labels[p]&&p!==page){page=p;render();}});
 setInterval(()=>{
   let changed=false;state.campaigns=state.campaigns.map(c=>{if(c.status!=='running')return c;changed=true;return transition(c,'tick');});

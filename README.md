@@ -1,45 +1,39 @@
 # HyperAccts
 
-A Windows desktop workspace for campaign workflows, reusable solutions, and a creator marketplace. The public website is designed for **HyperAccts.com**, hosted on the owner's Hetzner server.
+Version 0.2.0 adds persistent executable workflows, campaign runs, and a versioned workflow marketplace. The default interface uses the server runtime; the earlier browser simulation remains in source for historical tests.
 
-## Preview status
+## What works
 
-Version 0.1.0 is an interactive product prototype, not a complete replacement execution engine. Campaign runs, solution purchases, and creator publishing are local simulations. No real accounts are created. There is no public marketplace backend or payment processing yet.
+- Creator studio supports validation, field transformation, HTTP API calls, owner approval, timed waits, export, and conditional steps.
+- Publishing requires administrator review. Published versions are immutable; each campaign saves its exact workflow snapshot and hash.
+- Campaigns import CSV or JSON, bind the owner's API connections, start/pause/resume/cancel, review uncertain results, retry failed records, and export CSV/JSON.
+- SQLite persists workflows, campaigns, events, users and licenses. API credentials are encrypted with an installation-specific key.
+- The marketplace supports free installs and Stripe Connect checkout with signed webhook verification. Paid orders require matching session, amount, currency and metadata; refunds/disputes revoke the associated entitlement.
 
-See [current blockers and implementation handoff](docs/BLOCKERS.md) for the requested live-mode, DeepSeek, proxy-import, account-inventory and sales features, the assistance scope boundary, and release/CI limitations.
+This is an authorized API workflow engine. Platform-specific adapters, account inventory/sales and automatic bulk account registration are not included. Existing SMS/CAPTCHA endpoints remain balance-only compatibility routes; the live workflow engine does not use them.
 
-Included: campaign creation and editing, strict mock CSV import, simulation controls, per-record results, failed-record retry, export, local persistence, demo solution unlocks, version snapshots, creator step editor, connector requirements, SMSPVA / DaisySMS / 2Captcha profiles and balance-check adapters, and a public product website.
+## Run locally
 
-Planned platform coverage: Gmail, YouTube, Outlook, Facebook, Reddit, Instagram, Amazon, Apple accounts and Apple Developer enrollment, Google accounts and Google Play Console enrollment. Actual inspected legacy coverage varies; see [audit](docs/AUDIT.md).
+Requires Node.js 22.13 or later. Run `npm ci`, `npm test`, then `npm start` and open http://127.0.0.1:4173. Desktop: `npm run desktop`. Windows packages: `npm run build:win`.
 
-## Develop
+The default data directory is `~/.hyperaccts`; override `HYPERACCTS_DATA_DIR`. Electron uses its own user-data workspace directory. Back up the entire directory, including `credentials.key`, while the service is stopped. Losing the key makes saved credentials unreadable. The service remains bound to loopback.
 
-Requires Node.js 22 or newer.
+To try a complete flow, open Marketplace, choose the free approval workflow, create a campaign, import records with `name,email`, Start, approve the record, Resume, and export its results. To call your own API, create a connection and add an HTTP step in Creator studio. Workflow templates use `{{name}}`, `{{record.email}}` and `{{steps.stepId.data.id}}`.
 
-```sh
-npm ci
-npm test
-npm run desktop
-```
+On restart, interrupted campaigns pause. An interrupted API write requires owner review because its remote outcome may be unknown. Pause/cancel lets the current write settle and prevents subsequent steps. Idempotency keys are supplied on writes; the receiving API must support them to provide deduplication.
 
-`npm start` opens the desktop UI's local service on 127.0.0.1:4173. `npm run website` serves the separate public website preview on 127.0.0.1:4180. The packaged desktop app uses 127.0.0.1:4174 and a single-instance lock.
+## Hosted marketplace and payments
 
-## Windows download
+Use a separate data directory and an HTTPS reverse proxy that preserves the configured Host. Set `HYPERACCTS_PUBLIC_ORIGIN`, `HYPERACCTS_ADMIN_EMAIL`, and a strong `HYPERACCTS_ADMIN_PASSWORD` to bootstrap the administrator. Hosted mode requires sign-in and isolates records by owner. The local AI and legacy balance routes are unavailable in hosted mode.
 
-```sh
-npm run build:win
-```
+Paid publishing additionally needs `HYPERACCTS_MARKETPLACE_STRIPE_KEY` and `HYPERACCTS_MARKETPLACE_WEBHOOK_SECRET`, Stripe Connect onboarding for each creator, and a webhook at `/api/runtime/payments/webhook`. Subscribe to `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `charge.refunded`, and `charge.dispute.created`. These credentials are separate from the website's desktop-license checkout. No real payment has been verified in this release's test run; payment tests use provider fixtures.
 
-Produces `dist/HyperAccts-Setup-0.1.0.exe` and `dist/HyperAccts-Portable-0.1.0.exe` for Windows x64. Node.js is included in the app runtime; end users do not install development dependencies. Preview builds are unsigned. Production distribution needs code signing, update delivery, release validation, and a supported Windows version policy.
+The Windows packages are unsigned. This branch does not automatically replace the public installer or publish a hosted marketplace.
 
-## Provider keys
+## AI planning
 
-Use Connectors → Configure → Live API / balance check only. Paste the key and select Test connection. Keys stay in the local service's memory for the session; connection profiles store only an opaque reference. Re-enter keys after restarting. Alternatively use the environment variables in `.env.example` (the server does not automatically load .env files). Do not commit keys.
+The local assistant uses `HYPERACCTS_OLLAMA_URL` and `HYPERACCTS_AI_MODEL`. It provides planning text; it cannot execute a campaign or publish changes. Configure executable steps explicitly in Creator studio. Environment variables are read at startup; `.env` is not automatically loaded.
 
-Provider balance-check requests can reach real services when explicitly tested. Mock checks and campaign runs do not make provider purchases. Other provider cards are profile placeholders pending live adapters.
+## Verification
 
-## Public hosting
-
-Only the `website` directory is public. Desktop application routes and provider APIs are not deployed to the public site. `deploy/hyperaccts.nginx.conf` configures an isolated Nginx hostname at `/srv/hyperaccts/website`. Copy release installers into its `downloads` folder. The domain needs Cloudflare DNS records pointing to the Hetzner server, then an origin TLS certificate before using Cloudflare Full (strict). Never use Flexible SSL as the final configuration.
-
-See [architecture](docs/ARCHITECTURE.md), [product scope](docs/PRODUCT.md), and [deployment](docs/DEPLOYMENT.md).
+`npm test` covers a real local HTTP campaign from workflow publication through persisted API response, owner approval and export; account isolation; immutable versions; uncertain writes; restart recovery; payment matching and out-of-order refunds; and request-origin/network restrictions. Browser QA also completed workflow creation, publication, campaign creation, approval and completion through the interface.

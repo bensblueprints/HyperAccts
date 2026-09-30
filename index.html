@@ -15,15 +15,16 @@
         <button data-nav="platforms"><span>◫</span>Platforms</button>
         <button data-nav="marketplace"><span>◇</span>Marketplace</button>
         <button data-nav="creators"><span>⊞</span>Creator studio</button>
+        <button data-nav="assistant"><span>✧</span>AI assistant</button>
         <button data-nav="activity"><span>≋</span>Activity</button>
         <button data-nav="connectors"><span>⌘</span>Connectors</button>
         <button data-nav="connections"><span>⇄</span>System status</button>
       </nav>
       <div class="sidebar-next"><span class="tiny">BUILT TO BE SHARED</span><h3>Your next solution.</h3><p>Build a workflow. Package your expertise. Let others make it their own.</p><button class="sidebar-link" data-nav="creators">Open creator studio ↗</button></div>
-      <div class="sidebar-foot"><span class="dot"></span><div>Local demo workspace<small>Saved in this browser</small></div></div>
+      <div class="sidebar-foot"><span class="dot"></span><div>Persistent workspace<small>Saved by the local service</small></div></div>
     </aside>
     <main>
-      <header class="topbar"><div id="breadcrumb">Workspace <span>/</span> Campaigns</div><div class="topbar-right"><span class="demo-badge"><span class="dot"></span>Simulation mode</span><span class="avatar">HA</span></div></header>
+      <header class="topbar"><div id="breadcrumb">Workspace <span>/</span> Campaigns</div><div class="topbar-right"><span class="demo-badge" id="service-status">Connecting to workspace</span><span class="avatar">HA</span></div></header>
       <div id="app"></div>
     </main>
   </div>
@@ -33,6 +34,6 @@
   <dialog id="solution-dialog" aria-labelledby="solution-title"></dialog>
   <dialog id="creator-editor" aria-labelledby="creator-title"></dialog>
   <dialog id="connector-editor" aria-labelledby="connector-title"></dialog>
-  <script type="module" src="app.mjs"></script>
+  <script type="module" src="live-app.mjs"></script>
 </body>
 </html>
